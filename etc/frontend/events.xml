@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config>
+    <event name="controller_action_predispatch">
+      <observer name="login_intercept_check" instance="Baze\CredentialWorkflowControl\Observer\LoginInterceptCheck"/>
+    </event>
+</config>
