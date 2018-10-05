@@ -1,30 +1,38 @@
 <?php
-namespace Baze\CustomerImportExport\Model\Import;
+namespace Baze\CredentialWorkflowControl\Observer;
 
-use \Magento\CustomerImportExport\Model\Import\Address;
-
-class CustomerComposite extends \Magento\CustomerImportExport\Model\Import\CustomerComposite
+class LoginInterceptCheck implements \Magento\Framework\Event\ObserverInterface
 {
-    protected $nullEmailsImported = 0;
+    public const SESSION_VAR_NAME = "Baze_InterceptToken";
+    public const DESTINATION_PATH = "customer/account/createpassword";
+    public const WHITELIST_REGEXP = "/^\/?customer\/?/";
     
-    public function validateRow(array $rowData, $rowNumber)
-    {
-        if (strlen(trim($rowData['email'])) == 0) {
-            $rowData['email'] = 'valid@null.email';
-        }
-        return parent::validateRow($rowData, $rowNumber);
+    protected $customerSession;
+    protected $request;
+    protected $urlInterface;
+    
+    public function __construct(
+        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\UrlInterface $urlInterface
+    ) {
+        $this->customerSession = $customerSession;
+        $this->request = $request;
+        $this->urlInterface = $urlInterface;
     }
     
-    /**
-     * This doesn't actually do anything yet. It's SUPPOSED to assign a unique null address to each user, but the script just errors.
-     */
-    protected function _prepareRowForDb(array $rowData)
-    {
-        if (strlen(trim($this->_currentEmail)) == 0) {
-            $this->_currentEmail = 'noemail_'.time().$this->nullEmailsImported.'@null.email';
-            $rowData['email'] = $this->_currentEmail;
-            $nullEmailsImported++;
+	public function execute(\Magento\Framework\Event\Observer $observer)
+	{
+        if ($this->customerSession->isLoggedIn()) {
+            $path = $this->request->getPathInfo();
+            $inWhitelist = (preg_match(self::WHITELIST_REGEXP, $path) == 1);
+            if (!$inWhitelist) {
+                $intercept = $this->customerSession->getData(self::SESSION_VAR_NAME);
+                if ($intercept === "1") {
+                    $url = $this->urlInterface->getUrl(self::DESTINATION_PATH);
+                    $observer->getControllerAction()->getResponse()->setRedirect($url);
+                }
+            }
         }
-        return parent::_prepareRowForDb($rowData);
-    }
+	}
 }
