@@ -8,7 +8,7 @@
 
 /** @var \Baze\CredentialWorkflowControl\Block\Account\Resetpassword $block */
 ?>
-<form action="<?= $block->escapeUrl($block->getUrl('*/*/resetpasswordpost', ['_query' => ['token' => $block->getResetPasswordLinkToken()]])) ?>"
+<form action="<?= $block->escapeUrl($block->getUrl('*/*/createloginpost', ['_query' => ['token' => $block->getResetPasswordLinkToken()]])) ?>"
       method="post"
       <?php if ($block->isAutocompleteDisabled()) :?> autocomplete="off"<?php endif; ?>
       id="form-validate"

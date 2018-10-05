@@ -4,7 +4,7 @@ namespace Baze\CredentialWorkflowControl\Observer;
 class LoginInterceptCheck implements \Magento\Framework\Event\ObserverInterface
 {
     public const SESSION_VAR_NAME = "Baze_InterceptToken";
-    public const DESTINATION_PATH = "customer/account/createpassword";
+    public const DESTINATION_PATH = "customer/account/createlogin";
     public const WHITELIST_REGEXP = "/^\/?customer\/?/";
     
     protected $customerSession;
