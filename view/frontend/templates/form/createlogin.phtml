@@ -14,6 +14,7 @@
       id="form-validate"
       class="form password reset"
       data-mage-init='{"validation":{}}'>
+    <?= $block->getBlockHtml('formkey') ?>
     <fieldset class="fieldset" data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>">
         <div class="field email required">
             <label class="label" for="email"><span><?= $block->escapeHtml(__('Email')) ?></span></label>
