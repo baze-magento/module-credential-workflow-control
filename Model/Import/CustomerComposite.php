@@ -1,5 +1,5 @@
 <?php
-namespace Baze\CustomerImportExport\Model\Import;
+namespace Baze\CredentialWorkflowControl\Model\Import;
 
 use \Magento\CustomerImportExport\Model\Import\Address;
 

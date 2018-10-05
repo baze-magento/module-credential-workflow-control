@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
 <config>
-    <preference for="Magento\CustomerImportExport\Model\Import\CustomerComposite" type="Baze\CustomerImportExport\Model\Import\CustomerComposite" />
+    <preference for="Magento\CustomerImportExport\Model\Import\CustomerComposite" type="Baze\CredentialWorkflowControl\Model\Import\CustomerComposite" />
 </config>
