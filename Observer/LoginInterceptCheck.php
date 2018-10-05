@@ -4,7 +4,7 @@ namespace Baze\CredentialWorkflowControl\Observer;
 class LoginInterceptCheck implements \Magento\Framework\Event\ObserverInterface
 {
     public const SESSION_VAR_NAME = "Baze_InterceptToken";
-    public const DESTINATION_PATH = "customer/account/createpassword";
+    public const DESTINATION_PATH = "customer/account/createlogin";
     public const WHITELIST_REGEXP = "/^\/?customer\/?/";
     
     protected $customerSession;
@@ -21,8 +21,8 @@ class LoginInterceptCheck implements \Magento\Framework\Event\ObserverInterface
         $this->urlInterface = $urlInterface;
     }
     
-	public function execute(\Magento\Framework\Event\Observer $observer)
-	{
+    public function execute(\Magento\Framework\Event\Observer $observer)
+    {
         if ($this->customerSession->isLoggedIn()) {
             $path = $this->request->getPathInfo();
             $inWhitelist = (preg_match(self::WHITELIST_REGEXP, $path) == 1);
@@ -34,5 +34,5 @@ class LoginInterceptCheck implements \Magento\Framework\Event\ObserverInterface
                 }
             }
         }
-	}
+    }
 }
