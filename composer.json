@@ -6,8 +6,8 @@
         "magento/module-customer": "^101.0.6"
     },
     "suggest": {
-        "bazedk/magento-login-to-homepage"
-    }
+        "bazedk/magento-login-to-homepage": "Configures where customers land after completing their credentials."
+    },
     "type": "magento2-module",
     "autoload": {
         "files": [ "registration.php" ],
