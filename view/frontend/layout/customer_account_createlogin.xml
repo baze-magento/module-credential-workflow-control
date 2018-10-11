@@ -7,12 +7,12 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
-        <title>Set Email and New Password</title>
+        <title>Set Login Details</title>
     </head>
     <body>
         <referenceBlock name="root">
             <action method="setHeaderTitle">
-                <argument translate="true" name="title" xsi:type="string">Set Email and New Password</argument>
+                <argument translate="true" name="title" xsi:type="string">Set Login Details</argument>
             </action>
         </referenceBlock>
         <referenceContainer name="content">

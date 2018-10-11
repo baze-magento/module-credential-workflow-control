@@ -6,6 +6,8 @@
 
 // @codingStandardsIgnoreFile
 
+$customer = $block->getCurrentCustomerData();
+
 /** @var \Baze\CredentialWorkflowControl\Block\Account\Resetpassword $block */
 ?>
 <form action="<?= $block->escapeUrl($block->getUrl('*/*/createloginpost', ['_query' => ['token' => $block->getResetPasswordLinkToken()]])) ?>"
@@ -15,12 +17,39 @@
       class="form password reset"
       data-mage-init='{"validation":{}}'>
     <?= $block->getBlockHtml('formkey') ?>
-    <fieldset class="fieldset" data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>">
-        <div class="field email required">
-            <label class="label" for="email"><span><?= $block->escapeHtml(__('Email')) ?></span></label>
-            <div class="control">
-                <input type="email" class="input-text" name="email" id="email" data-validate="{required:true}" autocomplete="email" title="<?= $block->escapeHtmlAttr(__('Email')) ?>" data-validate="{required:true, 'validate-email':true}" />
+    <?php if (!$block->isEmailValid()) :?>
+        <fieldset class="fieldset" data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>">
+            <div class="field">
+                <?php
+                    $name = $customer->getFirstname();
+                    if (strlen($name) > 0) :?>
+                        <h3><?= $block->escapeHtml(__("You're almost ready, ")).$block->escapeHtml($name)."!" ?></h3>
+                    <?php else: ?>
+                        <h3><?= $block->escapeHtml(__("You're almost ready!")) ?></h3>
+                    <?php endif; ?>
+                <span><?= $block->escapeHtml(__("Before you can use the store, we need a bit more information. Please enter your email address, so you can receive order confirmations.")) ?></span>
             </div>
+            <div class="field email required">
+                <label class="label" for="email"><span><?= $block->escapeHtml(__('Email')) ?></span></label>
+                <div class="control">
+                    <input type="email" class="input-text" name="email" id="email" data-validate="{required:true}" autocomplete="email" title="<?= $block->escapeHtmlAttr(__('Email')) ?>" data-validate="{required:true, 'validate-email':true}" />
+                </div>
+            </div>
+            <div class="field confirmation required">
+                <label class="label" for="email-confirmation"><span><?= $block->escapeHtml(__('Confirm Email')) ?></span></label>
+                <div class="control">
+                    <input type="email" class="input-text" name="email_confirmation" id="email-confirmation" data-validate="{required:true,equalTo:'#email'}" autocomplete="off">
+                </div>
+            </div>
+        </fieldset>
+    <?php else: ?>
+        <fieldset class="fieldset" style="display: none;">
+            <input type="email" value="<?= $block->escapeHtmlAttr($customer->getEmail()) ?>" class="input-text" name="email" id="email" data-validate="{required:true}" autocomplete="email" title="<?= $block->escapeHtmlAttr(__('Email')) ?>" data-validate="{required:true, 'validate-email':true}" />
+        </fieldset>
+    <?php endif; ?>
+    <fieldset class="fieldset" data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>">
+        <div class="field">
+            <span><?= $block->escapeHtml(__("To ensure your security, please enter a new, private password. It should be something easy for you to remember.")) ?></span>
         </div>
         <div class="field password required" data-mage-init='{"passwordStrengthIndicator": {}}'>
             <label class="label" for="password"><span><?= $block->escapeHtml(__('New Password')) ?></span></label>
@@ -46,10 +75,23 @@
                 <input type="password" class="input-text" name="password_confirmation" id="password-confirmation" data-validate="{required:true,equalTo:'#password'}" autocomplete="off">
             </div>
         </div>
+        <div class="field">
+            <?php if (!$block->isEmailValid()) :?>
+                <span><?= $block->escapeHtml(__("Once you submit your Email and Password, you'll use these to log in in the future.")) ?></span>
+            <?php else: ?>
+                <span><?= $block->escapeHtml(__("Once you submit your new Password, you'll use it to log in in the future.")) ?></span>
+            <?php endif; ?>
+        </div>
     </fieldset>
     <div class="actions-toolbar">
         <div class="primary">
-            <button type="submit" class="action submit primary"><span><?= $block->escapeHtml(__('Set Email and New Password')) ?></span></button>
+            <button type="submit" class="action submit primary">
+                <?php if (!$block->isEmailValid()) :?>
+                    <span><?= $block->escapeHtml(__("Set Email and New Password")) ?></span>
+                <?php else: ?>
+                    <span><?= $block->escapeHtml(__("Set New Password")) ?></span>
+                <?php endif; ?>
+            </button>
         </div>
     </div>
 </form>

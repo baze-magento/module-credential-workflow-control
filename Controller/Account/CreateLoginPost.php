@@ -11,6 +11,7 @@ use Magento\Customer\Model\AuthenticationInterface;
 use Magento\Customer\Model\Customer\Mapper;
 use Magento\Customer\Model\EmailNotificationInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Customer\Api\AccountManagementInterface;
@@ -83,6 +84,9 @@ class CreateLoginPost extends \Magento\Customer\Controller\AbstractAccount
     /** @var Escaper */
     private $escaper;
 
+    /** @var ScopeConfigInterface */
+    private $scopeConfig;
+    
     /**
      * @param Context $context
      * @param Session $customerSession
@@ -91,6 +95,7 @@ class CreateLoginPost extends \Magento\Customer\Controller\AbstractAccount
      * @param Validator $formKeyValidator
      * @param CustomerExtractor $customerExtractor
      * @param Random $mathRandom
+     * @param ScopeConfigInterface $scopeConfig
      * @param Escaper|null $escaper
      */
     public function __construct(
@@ -101,6 +106,7 @@ class CreateLoginPost extends \Magento\Customer\Controller\AbstractAccount
         Validator $formKeyValidator,
         CustomerExtractor $customerExtractor,
         Random $mathRandom,
+        ScopeConfigInterface $scopeConfig,
         Escaper $escaper = null
     ) {
         parent::__construct($context);
@@ -110,6 +116,7 @@ class CreateLoginPost extends \Magento\Customer\Controller\AbstractAccount
         $this->formKeyValidator = $formKeyValidator;
         $this->customerExtractor = $customerExtractor;
         $this->mathRandom = $mathRandom;
+        $this->scopeConfig = $scopeConfig;
         $this->escaper = $escaper ?: ObjectManager::getInstance()->get(Escaper::class);
     }
 
@@ -118,7 +125,7 @@ class CreateLoginPost extends \Magento\Customer\Controller\AbstractAccount
      *
      * @return AuthenticationInterface
      */
-    private function getAuthentication()
+    protected function getAuthentication()
     {
 
         if (!($this->authentication instanceof AuthenticationInterface)) {
@@ -147,7 +154,7 @@ class CreateLoginPost extends \Magento\Customer\Controller\AbstractAccount
                 $this->_request,
                 $currentCustomerDataObject
             );
-
+            
             try {
                 $isPasswordChanged = $this->changeCustomerPassword($currentCustomerDataObject->getEmail());
 
@@ -155,7 +162,18 @@ class CreateLoginPost extends \Magento\Customer\Controller\AbstractAccount
                 $this->customerRepository->save($customerCandidateDataObject);
                 $this->messageManager->addSuccess(__('You saved your account information.'));
                 $this->session->setData(LoginInterceptCheck::SESSION_VAR_NAME, "0");
-                return $resultRedirect->setPath('customer/account');
+                
+                $email = ($this->getRequest()->getPost('email') == null) ? $currentCustomerDataObject->getEmail() : $this->getRequest()->getPost('email');
+                
+                $customer = $this->customerAccountManagement->authenticate($email, $this->getRequest()->getPost('password'));
+                $this->session->setCustomerDataAsLoggedIn($customer);
+                $this->session->regenerateId();
+                if (1 == $this->scopeConfig->getValue('customer/startup/asdf', ScopeInterface::SCOPE_STORE)) {
+                    $resultRedirect->setPath($this->scopeConfig->getValue('customer/startup/fixed_redirect_destination', ScopeInterface::SCOPE_STORE));
+                } else {
+                    $resultRedirect->setPath('customer/account');
+                }
+                return $resultRedirect;
             } catch (InvalidEmailOrPasswordException $e) {
                 $this->messageManager->addError($e->getMessage());
             } catch (UserLockedException $e) {
@@ -188,7 +206,7 @@ class CreateLoginPost extends \Magento\Customer\Controller\AbstractAccount
      *
      * @return \Magento\Customer\Api\Data\CustomerInterface
      */
-    private function getCustomerDataObject($customerId)
+    protected function getCustomerDataObject($customerId)
     {
         return $this->customerRepository->getById($customerId);
     }
@@ -200,7 +218,7 @@ class CreateLoginPost extends \Magento\Customer\Controller\AbstractAccount
      * @param \Magento\Customer\Api\Data\CustomerInterface $currentCustomerData
      * @return \Magento\Customer\Api\Data\CustomerInterface
      */
-    private function populateNewCustomerDataObject(
+    protected function populateNewCustomerDataObject(
         \Magento\Framework\App\RequestInterface $inputData,
         \Magento\Customer\Api\Data\CustomerInterface $currentCustomerData
     ) {
@@ -251,7 +269,7 @@ class CreateLoginPost extends \Magento\Customer\Controller\AbstractAccount
      *
      * @deprecated 100.1.3
      */
-    private function getCustomerMapper()
+    protected function getCustomerMapper()
     {
         if ($this->customerMapper === null) {
             $this->customerMapper = ObjectManager::getInstance()->get(\Magento\Customer\Model\Customer\Mapper::class);
