@@ -1,12 +1,12 @@
 {
-    "name": "bazedk/magento-credential-workflow-control",
+    "name": "baze/module-credential-workflow-control",
     "description": "Add a screen to intercept users with incomplete credentials.",
     "require": {
         "php": "~5.6.0|^7.0.0",
         "magento/module-customer": "^101.0.6"
     },
     "suggest": {
-        "bazedk/magento-login-to-homepage": "Configures where customers land after completing their credentials."
+        "baze/module-login-redirect-control": "Configures where customers land after completing their credentials."
     },
     "type": "magento2-module",
     "autoload": {
