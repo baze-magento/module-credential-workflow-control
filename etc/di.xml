@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
 <config>
     <preference for="Magento\CustomerImportExport\Model\Import\CustomerComposite" type="Baze\CredentialWorkflowControl\Model\Import\CustomerComposite" />
+    <preference for="Magento\PageCache\Model\App\FrontController\BuiltinPlugin" type="Baze\CredentialWorkflowControl\Plugin\Cache" />
 </config>
